@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default Fib = () => {
+const Fib = () => {
   const [seenIndexes, setSeenIndexes] = useState([]);
   const [values, setValues] = useState({});
   const [index, setIndex] = useState('');
@@ -14,7 +14,7 @@ export default Fib = () => {
 
   }
 
-  const handleSubmit = (event) => {
+  const handleChange = (event) => {
     setIndex(event.target.value);
   }
 
@@ -46,3 +46,5 @@ export default Fib = () => {
     </div>
   );
 };
+
+export default Fib;
