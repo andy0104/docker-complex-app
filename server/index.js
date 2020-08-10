@@ -19,7 +19,7 @@ const pgClient = new Pool({
   port: keys.pgPort
 });
 
-// pgClient.on('error', () => console.log('Lost PG connection in Express App'));
+pgClient.on('error', () => console.log('Lost PG connection in Express App'));
 pgClient.on('connect', () => {
   pgClient
   .query(`CREATE TABLE IF NOT EXISTS values (number INT)`)
@@ -42,11 +42,13 @@ app.get('/', (req, res) => {
 
 app.get('/values/all', async (req, res) => {
   const values = await pgClient.query(`SELECT * FROM values`);
+  console.log(values);
   res.send(values.rows);
 });
 
 app.get('/values/current', async (req, res) => {
   redisClient.hgetall('values', (err, values) => {
+    console.log(values);
     res.send(values);
   });
 });
@@ -61,7 +63,12 @@ app.post('/values', async (req, res) => {
   redisClient.hset('values', index, 'Nothing yet!');
   redisPublisher.publish('insert', index);
 
-  pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
+  try {
+    pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
+  } catch (error) {
+    console.log('PG Error');
+    console.log(error);
+  }  
 
   res.send({ working: true });
 });
