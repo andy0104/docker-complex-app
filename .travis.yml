@@ -1,0 +1,25 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t anindakar0104/complex-react-client-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true anindakar0104/complex-react-client-test npm run test
+
+after_success:
+  - docker build -t anindakar0104/complex-react-client ./client
+  - docker build -t anindakar0104/complex-express-server ./server
+  - docker build -t anindakar0104/complex-express-worker ./worker
+  - docker build -t anindakar0104/complex-nginx ./nginx
+
+  # Login to docker hub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # Take these docker images and push them to docker hub
+  - docker push anindakar0104/complex-react-client
+  - docker push anindakar0104/complex-express-server
+  - docker push anindakar0104/complex-express-worker
+  - docker push anindakar0104/complex-nginx
